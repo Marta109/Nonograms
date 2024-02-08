@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.querySelector("#random-game").addEventListener("click", () => {
-    console.log(allGameData);
     let randomLevel = [Math.floor(Math.random() * data.level.length)];
     let randomLevelName = data.level[randomLevel].trim();
 
@@ -112,19 +111,11 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     let randomNonogramName = data[randomLevelName][randomNameIndex].trim();
-    console.log(randomLevelName);
-    console.log(randomNameIndex);
-    console.log(randomNonogramName);
-    console.log(allGameData[randomLevelName][randomNonogramName]);
-    // console.log(allGameData["Hard  - 15x15"]["robot "]);
+
     gameRestart();
+    document.querySelector(
+      ".game-title"
+    ).textContent = `Level ${randomLevelName} Nonogram - ${randomNonogramName} `;
     createBoard(allGameData[randomLevelName][randomNonogramName]);
-    // console.log("data.level[randomLevel]", data.level[randomLevel]);
-    // console.log(
-    //   "data.level[randomLevel][nonogramNameIndex]",
-    //   data.level[randomLevel][nonogramNameIndex]
-    // );
-    // console.log("nonogramNameIndex", nonogramNameIndex);
-    // console.log("nonogramName=", data[randomLevelName]);
   });
 });
