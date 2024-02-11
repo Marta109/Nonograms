@@ -1,5 +1,3 @@
-// document.addEventListener("DOMContentLoaded", () => {
-// import {gameData} from "./data.js";
 import {timer} from "./timer.js";
 
 let receiveGameData = [];
@@ -9,7 +7,7 @@ let nonogramSize = 5;
 
 let timerStart = false;
 
-//  show nonogram solution
+//  ------------ show nonogram solution  ------------
 const showNonogram = () => {
   const nonogramItems = document.querySelectorAll(".nonogram-item"),
     mainBoard = document.querySelector(".main-game-board"),
@@ -22,7 +20,6 @@ const showNonogram = () => {
 
   timerStart = false;
   timer(timerStart);
-  console.log(gameSolution);
   gameSolution.forEach((arr) => {
     arr.forEach((el) => {
       nonogramItems[index].classList.remove("cross", "checked");
@@ -65,27 +62,24 @@ const changeNonogram = () => {
       gameRestart();
     });
 };
-// -------------   continue game  -------------'
 
+// -------------   continue game  -------------'
 const getData = () => {
   const continueGameBtn = document.querySelector("#continueGame");
   const gameData = JSON.parse(localStorage.getItem("savedGameData"));
-  const playerData = JSON.parse(localStorage.getItem("savedPlayerData"));
+  const newPlayerData = JSON.parse(
+    localStorage.getItem("savedPlayerData")
+  );
 
   gameRestart();
   createBoard(gameData);
   const nonogramItems = document.querySelectorAll(".nonogram-item");
-  // mainBoard = document.querySelector(".main-game-board"),
-  // showSolutionBtn = document.querySelector("#solution");
 
   let index = 0;
-  // saveGame.classList.add("btn-disabled");
-  // mainBoard.style.pointerEvents = "none";
-
   timerStart = false;
   timer(timerStart);
 
-  playerData.forEach((arr) => {
+  newPlayerData.forEach((arr) => {
     arr.forEach((el) => {
       if (el === 1) {
         nonogramItems[index].classList.add("checked");
@@ -94,14 +88,14 @@ const getData = () => {
       }
       {
       }
-      // else {
-      //   nonogramItems[index].classList.add("cross");
-      // }
       index++;
     });
   });
 
-  // continueGameBtn.removeEventListener("click", getData);
+  playerData = newPlayerData;
+  document.querySelector(
+    ".game-title"
+  ).textContent = `Level ${gameData.nonogramInfo.level} Nonogram - ${gameData.nonogramInfo.nonogramName} `;
 };
 
 const continueGame = () => {
@@ -110,50 +104,77 @@ const continueGame = () => {
   continueGameBtn.addEventListener("click", getData);
 };
 
+//  ------------ get info about nonogram name, level  and timer time  ------------
+const getNonogramInfo = (timerTime) => {
+  const nonogramInfo = document.querySelector(".game-title").textContent;
+
+  const newData = [
+    {
+      time: timerTime,
+      level: nonogramInfo
+        .substring(
+          nonogramInfo.indexOf("Level") + "Level".length,
+          nonogramInfo.indexOf("Nonogram")
+        )
+        .trim(),
+      name: nonogramInfo
+        .substring(nonogramInfo.lastIndexOf("-") + 1)
+        .trim(),
+    },
+  ];
+
+  if (timerTime) {
+    return newData;
+  }
+
+  return {level: newData[0].level, nonogramName: newData[0].name};
+};
+
 // -------------   save game  -------------'
 const saveGame = () => {
   const saveGameBtn = document.querySelector("#saveGame"),
     continueGameBtn = document.querySelector("#continueGame");
 
   saveGameBtn.addEventListener("click", () => {
-    const gameDataString = JSON.stringify(receiveGameData);
+    let gameDataString = receiveGameData;
+    gameDataString.nonogramInfo = getNonogramInfo();
+
+    gameDataString = JSON.stringify(gameDataString);
     const playerDataString = JSON.stringify(playerData);
 
     localStorage.setItem("savedGameData", gameDataString);
     localStorage.setItem("savedPlayerData", playerDataString);
 
     continueGameBtn.classList.remove("btn-disabled");
-    // isSaveGame = true;
     continueGame();
   });
 };
 
 const updateTable = (data) => {
-  let sortedData = data.flat();
+  if (data) {
+    let sortedData = data.flat();
 
-  sortedData.sort((a, b) => {
-    let timeA = parseInt(a.time.replace(/\D/g, ""));
-    let timeB = parseInt(b.time.replace(/\D/g, ""));
-    return timeA - timeB;
-  });
-
-  const table = document.querySelectorAll("tr");
-  // console.log(table);
-
-  sortedData.forEach((obj, i) => {
-    // console.log(el[0]);
-    const tableItem = table[i + 1].querySelectorAll("td");
-    Object.values(obj).forEach((el, i) => {
-      tableItem[i].textContent = el;
-      // console.log(el);
+    sortedData.sort((a, b) => {
+      let timeA = parseInt(a.time.replace(/\D/g, ""));
+      let timeB = parseInt(b.time.replace(/\D/g, ""));
+      return timeA - timeB;
     });
-  });
+
+    const table = document.querySelectorAll("tr");
+
+    sortedData.forEach((obj, i) => {
+      const tableItem = table[i + 1].querySelectorAll("td");
+      Object.values(obj).forEach((el, i) => {
+        tableItem[i].textContent = el;
+      });
+    });
+  }
 };
 
 // -------------   check game status -------------'
 const checkGameStatus = () => {
   if (
-    JSON.stringify(playerData).replace("2", "0") ===
+    JSON.stringify(playerData).replace(/2/g, "0") ===
     JSON.stringify(gameSolution)
   ) {
     const audio = document.querySelector("#audio");
@@ -165,26 +186,11 @@ const checkGameStatus = () => {
     const gameModal = document.querySelector(".modal_container"),
       modalContent = document.querySelector(".modal_content"),
       modalTitle = document.querySelector(".modal-title"),
-      timerTime = document.querySelector(".timer").textContent,
-      nonogramInfo = document.querySelector(".game-title").textContent;
+      timerTime = document.querySelector(".timer").textContent;
 
     const savedData = JSON.parse(localStorage.getItem("scoreTable"));
 
-    const newData = [
-      {
-        time: timerTime,
-        level: nonogramInfo
-          .substring(
-            nonogramInfo.indexOf("Level") + "Level".length,
-            nonogramInfo.indexOf("Nonogram")
-          )
-          .trim(),
-        name: nonogramInfo
-          .substring(nonogramInfo.lastIndexOf("-") + 1)
-          .trim(),
-      },
-    ];
-
+    const newData = getNonogramInfo(timerTime);
     if (savedData) {
       if (savedData.length === 5) {
         savedData.shift();
@@ -218,7 +224,7 @@ const changePlayerData = (el, itemIndex, dataAtt) => {
   checkGameStatus();
 };
 
-/// ------------- change data attribute -------------'
+/// ------------- change data attributes -------------'
 const changeDataAtt = (
   el,
   dataAtt,
@@ -323,7 +329,7 @@ const startGame = () => {
 //  -------------------- create game board -------------------------------
 const createBoard = (gameData) => {
   nonogramSize = Object.keys(gameData.top).length;
-
+  updateTable();
   const gameBoardContainer = document.querySelector(
       ".game-board-container"
     ),
@@ -348,6 +354,7 @@ const createBoard = (gameData) => {
 
   leftColumn.style.gridTemplateColumns = `repeat(1,  minmax(5%, 1fr)`;
   leftColumn.style.gridTemplateRows = `repeat(${nonogramSize},  minmax(5%, 1fr)`;
+  // leftColumn.style.gridColumn = `2/${nonogramSize + 2}`;
 
   for (let i = 0; i < nonogramSize; i++) {
     const gamePromptRowItem = document.createElement("div");
@@ -382,6 +389,5 @@ const createBoard = (gameData) => {
   receiveGameData = gameData;
   startGame();
 };
-// });
 
 export {createBoard, gameRestart};
