@@ -5,7 +5,7 @@ Nonograms is a puzzle game to reveal a hidden picture by looking at the number c
 3. Screenshot:![303911071-4d93dee3-12ad-4ef8-80a8-b6f355af06f3](https://github.com/user-attachments/assets/96d17344-fd0d-4a94-ad43-fe7eb76668d2)
 ![Screenshot_1](https://github.com/user-attachments/assets/0fcfd823-bad0-4c65-bee7-b7538ac56f09)
 
-
+ 
  Score: 250 / 250
   - [x] Basic scope +80 points
     - [x]  layout, design, responsive UI: +20
